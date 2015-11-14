@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <inttypes.h>
+#include <vector>
 
 /// One skill
 struct Skill
@@ -49,13 +50,18 @@ public:
 
 	void print() const;
 
+	static
+	void loadVec(FILE *ifile, std::vector<Character*> *chars, int *validCtP);
+
 private: // methods
 	struct SkillDef;
+	static const SkillDef skillDefs[];
 
 	static
 	uint32_t scaleStat(uint8_t raw);
 
-	const SkillDef* findSkill(const uint8_t *buf) const;
+	static
+	const SkillDef* findSkill(const uint8_t *buf);
 
 	void printSkill(uint32_t ct) const;
 

@@ -9,7 +9,8 @@ struct Character::SkillDef
 {
 	uint8_t code[9];
 	const char *desc;
-} skillDefs[] =
+};
+const Character::SkillDef Character::skillDefs[] =
 {
 	{{0x81, 0x49, 0xE1, 0x20, 0x70, 0x50, 0x00, 0x00, 0x75}, "Broad Axe"},
 	{{0xA1, 0x49, 0xE1, 0x24, 0xEE, 0xF9, 0x10, 0xC0, 0x5D}, "Broadsword"},
@@ -137,7 +138,7 @@ uint32_t Character::scaleStat(uint8_t raw)
 	return raw / 1.5;
 }
 
-const Character::SkillDef* Character::findSkill(const uint8_t *buf) const
+const Character::SkillDef* Character::findSkill(const uint8_t *buf)
 {
 	int i = 0;
 	while (skillDefs[i].desc)
@@ -160,23 +161,33 @@ void Character::printSkill(uint32_t ct) const
 }
 
 //----------------------------------------------------------------------------
-int main(int argc, char **argv)
+void Character::loadVec(FILE *ifile, std::vector<Character*> *chars, int *validCtP)
 {
-	FILE *ifile = fopen(argv[1], "rb");
-	FILE *ofile = fopen(argv[2], "wb");
+	int &validCt = *validCtP;
 
 	Character *c = readChar(ifile);
-	std::vector<Character*> chars;
-	int validCt = 0;
+	validCt = 0;
 	while (!feof(ifile))
 	{
-		chars.push_back(c);
+		chars->push_back(c);
 		if (c->valid())
 			++validCt;
 
 		c = readChar(ifile);
 	}
+
 	delete c;
+}
+
+//----------------------------------------------------------------------------
+int main(int argc, char **argv)
+{
+	FILE *ifile = fopen(argv[1], "rb");
+	FILE *ofile = fopen(argv[2], "wb");
+
+	int validCt = 0;
+	std::vector<Character*> chars;
+	Character::loadVec(ifile, &chars, &validCt);
 
 	printf("Read %ld characters, %d valid\n", chars.size(), validCt);
 
