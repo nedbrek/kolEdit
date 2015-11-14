@@ -28,7 +28,7 @@ public:
 	{
 	}
 
-	void read(FILE *ifile);
+	bool read(FILE *ifile);
 	void write(FILE *ofile);
 
 	bool valid() const;
