@@ -1,10 +1,11 @@
+#include "kol.h"
 #include <cstring>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
-struct SkillDef
+struct Character::SkillDef
 {
 	uint8_t code[9];
 	const char *desc;
@@ -35,32 +36,6 @@ uint32_t readBigEndian(const uint8_t *buf, uint32_t sz)
 	}
 
 	return ret;
-}
-
-SkillDef* findSkill(const uint8_t *buf)
-{
-	int i = 0;
-	while (skillDefs[i].desc)
-	{
-		if (memcmp(skillDefs[i].code, buf, 9) == 0)
-			return &skillDefs[i];
-
-		++i;
-	}
-	return 0;
-}
-
-void printSkill(const uint8_t *buf, uint32_t ct)
-{
-	const uint32_t base = 0x4a;
-	const uint32_t offset = base + ct * 13;
-	SkillDef *sd = findSkill(&buf[offset]);
-	if (sd)
-	{
-		const uint32_t off = readBigEndian(&buf[offset+9], 2) / 10;
-		const uint32_t def = readBigEndian(&buf[offset+11], 2) / 10;
-		printf("\tSkill %d: %s (%d/%d)\n", ct + 1, sd->desc, off, def);
-	}
 }
 
 Character* readChar(FILE *ifile)
@@ -105,6 +80,21 @@ uint32_t Character::intelligence() const { return scaleStat(buf[0x23]); }
 uint32_t Character::adventurePoints() const { return readBigEndian(&buf[0x26], 2); }
 uint32_t Character::gold() const { return readBigEndian(&buf[0x2a], 3); }
 
+Skill Character::getSkill(uint32_t cnt) const
+{
+	Skill ret;
+	const uint32_t base = 0x4a;
+	const uint32_t offset = base + cnt * 13;
+	const SkillDef *sd = findSkill(&buf[offset]);
+	if (sd)
+	{
+		ret.desc = sd->desc;
+		ret.offense = readBigEndian(&buf[offset+9], 2) / 10;
+		ret.defense = readBigEndian(&buf[offset+11], 2) / 10;
+	}
+	return ret;
+}
+
 void Character::print() const
 {
 	if (!valid())
@@ -129,8 +119,8 @@ void Character::print() const
 
 	printf("\tGold: %d\n", gold());
 
-	printSkill(&buf[0], 0);
-	printSkill(&buf[0], 1);
+	printSkill(0);
+	printSkill(1);
 
 	printf("\tQuest");
 	printf(" %02x", buf[0x1e2]);
@@ -145,6 +135,28 @@ void Character::print() const
 uint32_t Character::scaleStat(uint8_t raw)
 {
 	return raw / 1.5;
+}
+
+const Character::SkillDef* Character::findSkill(const uint8_t *buf) const
+{
+	int i = 0;
+	while (skillDefs[i].desc)
+	{
+		if (memcmp(skillDefs[i].code, buf, 9) == 0)
+			return &skillDefs[i];
+
+		++i;
+	}
+	return 0;
+}
+
+void Character::printSkill(uint32_t ct) const
+{
+	Skill s = getSkill(ct);
+	if (!s.desc)
+		return;
+
+	printf("\tSkill %d: %s (%d/%d)\n", ct + 1, s.desc, s.offense, s.defense);
 }
 
 //----------------------------------------------------------------------------

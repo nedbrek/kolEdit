@@ -4,6 +4,22 @@
 #include <cstdio>
 #include <inttypes.h>
 
+/// One skill
+struct Skill
+{
+	const char *desc;
+	uint32_t offense;
+	uint32_t defense;
+
+	Skill()
+	: desc(0)
+	, offense(0)
+	, defense(0)
+	{
+	}
+};
+
+/// Hold the character data from disk
 class Character
 {
 public:
@@ -29,11 +45,19 @@ public:
 	uint32_t adventurePoints() const;
 	uint32_t gold() const;
 
+	Skill getSkill(uint32_t cnt) const;
+
 	void print() const;
 
 private: // methods
+	struct SkillDef;
+
 	static
 	uint32_t scaleStat(uint8_t raw);
+
+	const SkillDef* findSkill(const uint8_t *buf) const;
+
+	void printSkill(uint32_t ct) const;
 
 private: // data
 	uint8_t buf[768];
