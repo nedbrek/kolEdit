@@ -1,0 +1,78 @@
+768 (0x300) bytes per character
+name is NULL terminated
+numbers are big endian
+
+offset    field
+000       name
+01B       damage?
+01C       race
+01D       strength
+01E       quickness
+01F       size
+020       endurance
+021       foresight
+022       charisma
+023       intelligence
+026 27    adventure points
+029       level
+02A 2B 2C gold
+030 3C    equipped weapon
+040       inn
+04A 56    skill 1
+057 63    skill 2
+064 70    skill 3
+071 7D    skill 4
+07D 7E 7F date (y/d/m)
+09F       hunger
+0A0       pocket 1
+0B0       pocket 2
+0C0       pocket 3
+0D0       pocket 4
+0E0       pocket 5
+0F0       pocket 6
+100       head
+110       torso
+120       legs
+130       body
+140       hands
+150       feet
+160       shield
+170       neck
+180       ring
+190       belt
+1A0       magic order
+1B0       horse type
+1E2       quest status (6 bytes)
+200 2FF   spells (16 spells, 16 bytes each)
+
+weapon skill 13 bytes
+0 9 code
+A B offense
+C D defense
+
+1  2  3  4  5  6  7  8  9
+A3 C8 A1 A4 EE F9 10 03 57 Greatsword
+74 05 82 2C 88 00 00 00 7E Halberd
+96 3D C7 9D DF 22 68 13 5C Longsword
+72 B0 C0 13 EE 00 00 00 0B Elf Bow
+81 49 E1 20 70 50 00 00 75 Broad Axe
+
+Name: Muskels
+   Str  : 90
+Strength	90
+   Quick: 61
+Quickness	61
+   Size : 69
+
+   End  : 78
+   Fore : 71
+   Chsma: 61
+   Intel: 58
+
+Health	78
+Foresight	71
+Charisma	61
+Intellect	58
+Balance	74
+Endurance	84
+
