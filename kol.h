@@ -50,6 +50,10 @@ public:
 
 	void print() const;
 
+	void setAdventurePoints(uint32_t newAp);
+
+	void setSkill(uint32_t cnt, const Skill &newSkill);
+
 	static
 	void loadVec(FILE *ifile, std::vector<Character*> *chars, int *validCtP);
 

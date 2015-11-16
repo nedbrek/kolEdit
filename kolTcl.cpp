@@ -16,6 +16,7 @@ public:
 
 		int validCt = 0;
 		Character::loadVec(ifile, &chars_, &validCt);
+		fclose(ifile);
 		return validCt > 0;
 	}
 
@@ -29,6 +30,36 @@ public:
 		{
 			(**i).write(ofile);
 		}
+		fclose(ofile);
+	}
+
+	bool train(Tcl_WideInt charNum, Tcl_WideInt skillNum, Tcl_WideInt amt)
+	{
+		if (charNum < 0 || charNum >= uint32_t(chars_.size()))
+			return false;
+		if (skillNum < 0 || skillNum > 3)
+			return false;
+		if (amt <= 0)
+			return false;
+
+		Character *c = chars_[charNum];
+		if (!c->valid())
+			return false;
+
+		uint32_t ap = c->adventurePoints();
+		if (ap < amt * 100)
+			return false;
+
+		Skill s = c->getSkill(skillNum);
+		if (!s.desc)
+			return false;
+
+		s.offense += amt;
+		ap -= amt * 100;
+
+		c->setSkill(skillNum, s);
+		c->setAdventurePoints(ap);
+		return true;
 	}
 
 private:
@@ -69,6 +100,20 @@ int charCmd(ClientData cdata, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[
 	return TCL_OK;
 }
 
+static
+int trainCmd(ClientData cdata, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
+{
+	if (objc < 4)
+	{
+		Tcl_AppendResult(interp, "Usage: kol::train <charNum> <skillNum> <amount>", NULL);
+		return TCL_ERROR;
+	}
+
+	Parms p(interp, objv, unsigned(objc));
+	static_cast<KolData*>(cdata)->train(p[0], p[1], p[2]);
+	return TCL_OK;
+}
+
 extern "C"
 int Koledit_Init(Tcl_Interp *interp)
 {
@@ -77,6 +122,7 @@ int Koledit_Init(Tcl_Interp *interp)
 	Tcl_CreateObjCommand(interp, "kol::load", loadCmd, data, NULL);
 	Tcl_CreateObjCommand(interp, "kol::save", saveCmd, data, NULL);
 	Tcl_CreateObjCommand(interp, "kol::char", charCmd, data, NULL);
+	Tcl_CreateObjCommand(interp, "kol::train", trainCmd, data, NULL);
 
 	return TCL_OK;
 }

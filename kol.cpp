@@ -39,6 +39,16 @@ uint32_t readBigEndian(const uint8_t *buf, uint32_t sz)
 	return ret;
 }
 
+void writeBigEndian(uint8_t *buf, uint32_t sz, uint32_t val)
+{
+	while (sz)
+	{
+		--sz;
+		buf[sz] = val & 0xff;
+		val >>= 8;
+	}
+}
+
 Character* readChar(FILE *ifile)
 {
 	Character *cp = new Character;
@@ -79,6 +89,11 @@ uint32_t Character::intelligence() const { return scaleStat(buf[0x23]); }
 	//printf("\tFoo  : %d\n", buf[0x24]);
 	//printf("\tBar  : %d\n", buf[0x25]);
 uint32_t Character::adventurePoints() const { return readBigEndian(&buf[0x26], 2); }
+void Character::setAdventurePoints(uint32_t newAp)
+{
+	writeBigEndian(&buf[0x26], 2, newAp);
+}
+
 uint32_t Character::gold() const { return readBigEndian(&buf[0x2a], 3); }
 
 Skill Character::getSkill(uint32_t cnt) const
@@ -94,6 +109,15 @@ Skill Character::getSkill(uint32_t cnt) const
 		ret.defense = readBigEndian(&buf[offset+11], 2) / 10;
 	}
 	return ret;
+}
+
+void Character::setSkill(uint32_t cnt, const Skill &newSkill)
+{
+	const uint32_t base = 0x4a;
+	const uint32_t offset = base + cnt * 13;
+
+	writeBigEndian(&buf[offset+9], 2, newSkill.offense * 10);
+	writeBigEndian(&buf[offset+11], 2, newSkill.defense * 10);
 }
 
 void Character::print() const
