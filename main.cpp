@@ -8,11 +8,14 @@
 int main(int argc, char **argv)
 {
 	FILE *ifile = fopen(argv[1], "rb");
-	FILE *ofile = fopen(argv[2], "wb");
+	FILE *ofile = NULL;
+	if (argc > 2)
+		ofile = fopen(argv[2], "wb");
 
 	int validCt = 0;
 	std::vector<Character*> chars;
 	Character::loadVec(ifile, &chars, &validCt);
+	fclose(ifile);
 
 	printf("Read %ld characters, %d valid\n", chars.size(), validCt);
 
@@ -34,13 +37,15 @@ int main(int argc, char **argv)
 		std::getline(std::cin, cmd);
 	}
 
-	for (std::vector<Character*>::const_iterator i = chars.begin(); i != chars.end(); ++i)
+	if (ofile)
 	{
-		(**i).write(ofile);
+		for (std::vector<Character*>::const_iterator i = chars.begin(); i != chars.end(); ++i)
+		{
+			(**i).write(ofile);
+		}
+		fclose(ofile);
 	}
 
-	fclose(ifile);
-	fclose(ofile);
 	return 0;
 }
 
