@@ -39,6 +39,21 @@ namespace eval kol {
 		close $f
 	}
 
+	proc ap {charNum} {
+		variable chars
+
+		binary scan [string range [lindex $chars $charNum] 38 39] S ap
+		return $ap
+	}
+
+	proc gold {charNum} {
+		variable chars
+
+		binary scan [string range [lindex $chars $charNum] 42 44] cS top bot
+		# TODO handle large values properly
+		return [expr {$top * 65536 + $bot}]
+	}
+
 	proc skill {charNum skillNum} {
 		variable chars
 		variable weapons
@@ -56,6 +71,32 @@ namespace eval kol {
 		binary scan [string range $c $i+11 $i+12] S defense
 
 		return [list $weaponName [expr {$offense/10}] [expr {$defense/10}]]
+	}
+
+	proc setSkill {charNum skillNum skillVal} {
+		variable chars
+		variable weapons
+
+		set weaponCode ""
+		dict for {k v} $weapons {
+			if {$v eq [lindex $skillVal 0]} {
+				set weaponCode $k
+				break
+			}
+		}
+		if {$weaponCode eq ""} { return "Error" }
+
+		set off [expr {[lindex $skillVal 1] * 10}]
+		set def [expr {[lindex $skillVal 2] * 10}]
+
+		set newBin $weaponCode
+		append newBin [binary format S2 [list $off $def]]
+
+		set c [lindex $chars $charNum]
+		set i [expr {74 + $skillNum * 13}]
+
+		set c [string replace $c $i $i+12 $newBin]
+		lset chars $charNum $c
 	}
 }
 
