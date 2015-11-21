@@ -18,10 +18,10 @@ proc showChar {w} {
 proc buildGui {} {
 	.t.fL.lChars delete 0 end
 
-	foreach c $kol::chars {
-		set firstByteIndex [string first \0 $c]
-		if {$firstByteIndex > 0} {
-			.t.fL.lChars insert end [string range $c 0 $firstByteIndex-1]
+	for {set i 0} {$i < [llength $kol::chars]} {incr i} {
+		set name [kol::name $i]
+		if {$name ne ""} {
+			.t.fL.lChars insert end $name
 		}
 	}
 }

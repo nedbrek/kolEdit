@@ -41,12 +41,18 @@ namespace eval kol {
 	}
 
 	proc valid {charNum} {
+		return [expr [name $charNum] ne ""]
+	}
+
+	proc name {charNum} {
 		variable chars
-
 		set c [lindex $chars $charNum]
-		set firstByte [binary encode hex [string index $c 0]]
 
-		return [expr {$firstByte == "00"}]
+		set firstByteIndex [string first \0 $c]
+		if {$firstByteIndex > 0} {
+			return [string range $c 0 $firstByteIndex-1]
+		}
+		return ""
 	}
 
 	proc ap {charNum} {
