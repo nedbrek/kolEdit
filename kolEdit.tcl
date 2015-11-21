@@ -39,11 +39,30 @@ namespace eval kol {
 		close $f
 	}
 
+	proc valid {charNum} {
+		variable chars
+
+		set c [lindex $chars $charNum]
+		set firstByte [binary encode hex [string index $c 0]]
+
+		return [expr {$firstByte == "00"}]
+	}
+
 	proc ap {charNum} {
 		variable chars
 
 		binary scan [string range [lindex $chars $charNum] 38 39] S ap
 		return $ap
+	}
+
+	proc setAp {charNum newAp} {
+		variable chars
+
+		set c [lindex $chars $charNum]
+
+		set newBin [binary format S $newAp]
+
+		lset chars $charNum [string replace $c 38 39 $newBin]
 	}
 
 	proc gold {charNum} {
