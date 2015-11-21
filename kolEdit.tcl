@@ -17,6 +17,7 @@ namespace eval kol {
 
 	proc readFile {ifilename} {
 		variable chars
+		set chars [list]
 
 		set f [open $ifilename]
 		fconfigure $f -translation binary

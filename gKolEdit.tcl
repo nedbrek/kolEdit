@@ -3,10 +3,23 @@ package require Tk
 source kolEdit.tcl
 
 ##### GUI helpers
+proc showChar {w} {
+	set sel [$w curselection]
+	if {$sel eq ""} { return }
+
+	for {set i 0} {$i < 4} {incr i} {
+		set s [kol::skill $sel $i]
+		.t.fR.lName$i configure -text [lindex $s 0]
+		.t.fR.lOff$i configure -text [lindex $s 1]
+		.t.fR.lDef$i configure -text [lindex $s 2]
+	}
+}
+
 proc buildGui {} {
+	.t.fL.lChars delete 0 end
+
 	foreach c $kol::chars {
 		set firstByteIndex [string first \0 $c]
-
 		if {$firstByteIndex > 0} {
 			.t.fL.lChars insert end [string range $c 0 $firstByteIndex-1]
 		}
@@ -26,6 +39,7 @@ proc doOpen {} {
 
 proc doSave {} {
 	# TODO
+	# kol::writeFile $ofile
 }
 
 ##### GUI
@@ -50,6 +64,8 @@ menu .mTopMenu.mFile -tearoff 0
 ### left frame (character list)
 pack [frame .t.fL] -side left -fill y -expand 1 -anchor w
 pack [listbox .t.fL.lChars] -anchor w -fill y -expand 1
+
+bind .t.fL.lChars <<ListboxSelect>> {showChar %W}
 
 ### right frame (details)
 pack [frame .t.fR] -side left -fill y -expand 1 -anchor w
