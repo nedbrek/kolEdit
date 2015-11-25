@@ -13,6 +13,9 @@ proc showChar {w} {
 		.t.fR.lOff$i configure -text [lindex $s 1]
 		.t.fR.lDef$i configure -text [lindex $s 2]
 	}
+
+	.t.fR.vAp configure -text [kol::ap $sel]
+	.t.fR.vGold configure -text [kol::gold $sel]
 }
 
 proc buildGui {} {
@@ -31,15 +34,18 @@ proc doOpen {} {
 	set ofile [tk_getOpenFile]
 	if {$ofile eq ""} { return }
 
-	wm title .t "KOL Editor - [file tail $ofile]"
+	set kol::filename [file tail $ofile]
+	wm title .t "KOL Editor - $kol::filename"
 	kol::readFile $ofile
 
 	buildGui
 }
 
 proc doSave {} {
-	# TODO
-	# kol::writeFile $ofile
+	set f [tk_getSaveFile -initialfile $kol::filename]
+	if {$f eq ""} { return }
+
+	kol::writeFile $f
 }
 
 ##### GUI
@@ -75,6 +81,12 @@ for {set i 0} {$i < 4} {incr i} {
 	grid [label .t.fR.lOff$i -text "Offense"] -row $i -column 1 -sticky w
 	grid [label .t.fR.lDef$i -text "Defense"] -row $i -column 2 -sticky w
 }
+
+grid [label .t.fR.lAp -text "AP"] -row 4 -column 0 -sticky w
+grid [label .t.fR.vAp -text ""] -row 4 -column 1 -columnspan 2
+
+grid [label .t.fR.lGold -text "Gold"] -row 5 -column 0 -sticky w
+grid [label .t.fR.vGold -text ""] -row 5 -column 1 -columnspan 2
 
 bind .t <Destroy> {exit}
 
